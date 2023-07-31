@@ -6,12 +6,48 @@ public class Player : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 7f;
     [SerializeField] private GameInput gameInput;
+    [SerializeField] private LayerMask countersLayerMask;
 
 
     float rotateSpeed = 10;
     private bool isWalking;
 
+    private Vector3 lastInteractDir;
+
     void Update()
+    {
+        HandleMovement();
+        HandleInteractions();
+    }
+
+    //Controllo se il player si sta muovendo (per cambio animazione)
+    public bool IsWalking()
+    {
+        return isWalking;
+    }
+
+    private void HandleInteractions()
+    {
+        Vector2 inputVector = gameInput.GetMovementVectorNormalized();
+
+        Vector3 moveDir = new Vector3(inputVector.x, 0, inputVector.y);
+
+        if(moveDir != Vector3.zero)
+        {
+            lastInteractDir = moveDir;
+        }
+
+        float interactDistance = 2f;
+        if(Physics.Raycast(transform.position, moveDir, out RaycastHit raycastHit, interactDistance, countersLayerMask))
+        {
+            if(raycastHit.transform.TryGetComponent(out ClearCounter clearCounter))
+            {
+                clearCounter.Interact();
+            }
+        }
+    }
+
+    private void HandleMovement()
     {
         Vector2 inputVector = gameInput.GetMovementVectorNormalized();
 
@@ -59,12 +95,6 @@ public class Player : MonoBehaviour
         transform.forward = Vector3.Slerp(transform.forward, moveDir, Time.deltaTime * rotateSpeed);
 
         isWalking = moveDir != Vector3.zero;
-    }
-
-    //Controllo se il player si sta muovendo (per cambio animazione)
-    public bool IsWalking()
-    {
-        return isWalking;
     }
 
 
