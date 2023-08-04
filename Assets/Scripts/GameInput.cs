@@ -16,12 +16,14 @@ public class GameInput : MonoBehaviour
         playerInputActions = new PlayerInputActions();
         playerInputActions.Player.Enable();
 
-        playerInputActions.Player.Interact.performed +=  Interact_performed;        
+        playerInputActions.Player.Interact.performed += Interact_performed;
     }
 
     private void Interact_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
+        Debug.Log(obj);
         OnInteractAction?.Invoke(this, EventArgs.Empty); //Punto di domanda per controllare che evento sia != null
+        Debug.Log(OnInteractAction);
     }
 
     public Vector2 GetMovementVectorNormalized()
